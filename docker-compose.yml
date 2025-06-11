@@ -1,0 +1,119 @@
+version: '3.7'
+
+services:
+  postgres:
+    image: postgres:15.13-alpine3.22
+    container_name: POSTGRES_DB
+    restart: always
+    environment:
+      - POSTGRES_DB=${PG_DB}
+      - POSTGRES_USER=${PG_USER}
+      - POSTGRES_PASSWORD=${PG_PASSWD}
+    ports:
+      - "5432:5432"
+    networks:
+      - prisma-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
+      interval: 5s
+      timeout: 2s
+      retries: 20
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    command: postgres -c listen_addresses='*'
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+  app:
+    container_name: app
+    build: ./
+    restart: always
+    depends_on:
+      - postgres
+    networks:
+      - prisma-network
+    ports:
+      - ${PORT}:4000
+    environment:
+      PG_HOST: postgres
+networks:
+  prisma-network:
+
+volumes:
+  postgres_data:
+
+
+# version: '3.7'
+
+# services:
+#   postgres_db:
+#     image: postgres:15
+#     hostname: postgres_db
+#     container_name: postgres_db
+#     restart: always
+#     environment:
+#       POSTGRES_DB: postgres
+#       POSTGRES_USER: postgres
+#       POSTGRES_PASSWORD: prisma
+#     ports:
+#       - '5432:5432'
+#     networks:
+#       - prisma-network
+#     healthcheck:
+#       test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
+#       interval: 5s
+#       timeout: 2s
+#       retries: 20
+
+#   server:
+#     build: 
+#       context: .  
+#       dockerfile: Dockerfile
+#     ports:
+#       - '4000:4000'
+#     stdin_open: true
+#     tty: true  # Keeps the container running for debugging
+#     depends_on:
+#       postgres_db:
+#         condition: service_healthy
+#     env_file:
+#       - .env
+#     networks:
+#       - prisma-network
+# networks:
+#   prisma-network:
+#     name: prisma-network
+
+# version: '3.7'
+
+# services:
+#   postgres:
+#     image: postgres:15.13-alpine3.22
+#     restart: always
+#     environment:
+#       - POSTGRES_DB=postgres
+#       - POSTGRES_USER=postgres
+#       - POSTGRES_PASSWORD=prisma
+#     ports:
+#       - "5432:5432"
+#     networks:
+#       - prisma-network
+#     healthcheck:
+#       test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
+#       interval: 5s
+#       timeout: 2s
+#       retries: 20
+#     volumes:
+#       - postgres_data:/var/lib/postgresql/data
+#     command: postgres -c listen_addresses='*'
+#     logging:
+#       options:
+#         max-size: "10m"
+#         max-file: "3"
+
+# networks:
+#   prisma-network:
+
+# volumes:
+#   postgres_data:
