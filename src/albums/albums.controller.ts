@@ -3,7 +3,6 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
   BadRequestException,
@@ -50,7 +49,7 @@ export class AlbumsController {
     if (!validate(id)) {
       throw new BadRequestException(`id ${id} is not UUID type!`);
     }
-    let data: string | unknown = await this.albumsService.findOne(id);
+    const data: string | unknown = await this.albumsService.findOne(id);
     if (data == STATUS.NOTFOUND) {
       throw new NotFoundException(`artist with id ${id} no found!`);
     } else {
@@ -59,11 +58,14 @@ export class AlbumsController {
   }
 
   @Put(':id')
-  async update(@Param('id') id: string, @Body() UpdateAlbumDto: UpdateAlbumDto) {
+  async update(
+    @Param('id') id: string,
+    @Body() UpdateAlbumDto: UpdateAlbumDto,
+  ) {
     if (!validate(id)) {
       throw new BadRequestException(`id ${id} is not UUID type!`);
     }
-    let serviceAnswer: STATUS | unknown = await this.albumsService.update(
+    const serviceAnswer: STATUS | unknown = await this.albumsService.update(
       id,
       UpdateAlbumDto,
     );

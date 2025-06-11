@@ -17,18 +17,18 @@ export enum STATUS {
 @Injectable()
 export class AlbumsService {
   async create(CreateAlbumDto: CreateAlbumDto) {
-    let id = randomUUID();
+    const id = randomUUID();
     CreateAlbumDto.id = id;
     await prisma.album.create({
       data: {
         id: id,
         name: CreateAlbumDto.name,
         year: CreateAlbumDto.year,
-        artistId: CreateAlbumDto.artistId
-      }
-    })
+        artistId: CreateAlbumDto.artistId,
+      },
+    });
     console.log(`new album added!`);
-    const album = await prisma.album.findUnique({where: {id: id}});
+    const album = await prisma.album.findUnique({ where: { id: id } });
     return album;
   }
 
@@ -38,7 +38,7 @@ export class AlbumsService {
   }
 
   async findOne(id: string) {
-    let album = await prisma.album.findUnique({where: {id: id}});
+    const album = await prisma.album.findUnique({ where: { id: id } });
     if (album == undefined) {
       return STATUS.NOTFOUND;
     }
@@ -50,45 +50,45 @@ export class AlbumsService {
     if (UpdateAlbumDto.artistId !== null) {
       if (!validate(UpdateAlbumDto.artistId)) return STATUS.BADREQUEST;
     }
-    let name = UpdateAlbumDto.name;
-    let artistId = UpdateAlbumDto.artistId;
-    let year = UpdateAlbumDto.year;
+    const name = UpdateAlbumDto.name;
+    const artistId = UpdateAlbumDto.artistId;
+    const year = UpdateAlbumDto.year;
     if (name == undefined || year == undefined || typeof name == 'number')
       return STATUS.BADREQUEST;
-    let album = await prisma.album.findUnique({where: {id: id}});
+    const album = await prisma.album.findUnique({ where: { id: id } });
     if (album == undefined) {
       return STATUS.NOTFOUND;
     }
     await prisma.album.update({
       where: {
-        id: id
+        id: id,
       },
       data: {
         name: name,
         year: year,
-        artistId: artistId
-      }
+        artistId: artistId,
+      },
     });
     return `Album #${id} updated`;
   }
 
   async remove(id: string) {
-    let album =  await prisma.album.findUnique({where: {id: id}});
+    const album = await prisma.album.findUnique({ where: { id: id } });
     if (album == undefined) {
       return STATUS.NOTFOUND;
     }
-    let referTracks = await prisma.track.findMany({where: {albumId: id}});
-    if (referTracks){
+    const referTracks = await prisma.track.findMany({ where: { albumId: id } });
+    if (referTracks) {
       await prisma.track.updateMany({
         where: {
-          albumId: id
+          albumId: id,
         },
         data: {
-          albumId: null
-        }
+          albumId: null,
+        },
       });
-    };
-    await prisma.album.delete({where: {id: id}});
+    }
+    await prisma.album.delete({ where: { id: id } });
     console.log(`This action removes a #${id} album`);
     return STATUS.DELETED;
   }

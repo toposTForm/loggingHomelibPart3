@@ -44,7 +44,7 @@ export class UsersController {
     if (!validate(id)) {
       throw new BadRequestException(`id ${id} is not UUID type!`);
     }
-    let serviceAnswer: STATUS | unknown = await this.usersService.update(
+    const serviceAnswer: STATUS | unknown = await this.usersService.update(
       id,
       updatePasswordDto,
     );
@@ -69,7 +69,7 @@ export class UsersController {
     if (!validate(id)) {
       throw new BadRequestException(`id ${id} is not UUID type!`);
     }
-    let data: string | unknown = await this.usersService.findOne(id);
+    const data: string | unknown = await this.usersService.findOne(id);
     if (data == STATUS.NOTFOUND) {
       throw new NotFoundException(`user with id ${id} no found!`);
     } else {
@@ -84,7 +84,7 @@ export class UsersController {
     if (!validate(id)) {
       throw new BadRequestException(`id ${id} is not UUID type!`);
     }
-    let serviceAnswer: STATUS | unknown = await this.usersService.remove(id);
+    const serviceAnswer: STATUS | unknown = await this.usersService.remove(id);
     if (serviceAnswer == STATUS.NOTFOUND) {
       throw new NotFoundException(`user with id ${id} no found!`);
     }

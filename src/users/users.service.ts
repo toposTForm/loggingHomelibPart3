@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdatePasswordDto } from './dto/update-user.dto';
-import { randomUUID, UUID } from 'crypto';
+import { randomUUID } from 'crypto';
 import { User } from './entities/user.entity';
 import { createUser } from 'prisma/seed';
 import { prisma } from 'prisma/seed';
@@ -16,10 +16,10 @@ export enum STATUS {
 @Injectable()
 export class UsersService {
   async create(createUserDto: CreateUserDto) {
-    let genuuid = randomUUID();
-    let version = 1.0;
-    let createdAt = Date.now();
-    let updatedAt = Date.now();
+    const genuuid = randomUUID();
+    const version = 1.0;
+    const createdAt = Date.now();
+    const updatedAt = Date.now();
     const typeuser = new User(
       createUserDto,
       genuuid,
@@ -28,32 +28,31 @@ export class UsersService {
       updatedAt,
     );
     console.log('new user added!');
-    let temp = await createUser(typeuser);
-    let user = await prisma.user.findUnique({where: {id: genuuid}});
-     return {
+    const user = await prisma.user.findUnique({ where: { id: genuuid } });
+    return {
       id: user.id,
       login: user.login,
       version: user.version,
       createdAt: Number(user.createdAt),
-      updatedAt: Number(user.updatedAt)
+      updatedAt: Number(user.updatedAt),
     };
   }
 
   async findAll() {
     console.log(`This action returns all users`);
-    let allUsers = await prisma.user.findMany();
-    let tempUser = allUsers.map(field => ({
+    const allUsers = await prisma.user.findMany();
+    const tempUser = allUsers.map((field) => ({
       id: field.id,
       login: field.login,
       version: field.version,
       createdAt: Number(field.createdAt),
-      updatedAt: Number(field.updatedAt)
-    }))
+      updatedAt: Number(field.updatedAt),
+    }));
     return tempUser;
   }
 
   async findOne(id: string) {
-    let user = await prisma.user.findUnique({ where: {id: id}});
+    const user = await prisma.user.findUnique({ where: { id: id } });
     if (user == undefined) {
       return STATUS.NOTFOUND;
     }
@@ -63,40 +62,40 @@ export class UsersService {
       login: user.login,
       version: user.version,
       createdAt: Number(user.createdAt),
-      updatedAt: Number(user.updatedAt)
+      updatedAt: Number(user.updatedAt),
     };
   }
 
   async update(id: string, updatePasswordDto: UpdatePasswordDto) {
-    let newPassword = updatePasswordDto.newPassword;
-    let oldPassword = updatePasswordDto.oldPassword;
+    const newPassword = updatePasswordDto.newPassword;
+    const oldPassword = updatePasswordDto.oldPassword;
     if (newPassword == undefined || oldPassword == undefined)
       return STATUS.BADREQUEST;
-    let user = await prisma.user.findUnique({where: {id: id}})
+    const user = await prisma.user.findUnique({ where: { id: id } });
     if (user == undefined) {
       return STATUS.NOTFOUND;
     } else if (user.password !== oldPassword) return STATUS.WRONGDTO;
     await prisma.user.update({
       where: {
-        id: id
+        id: id,
       },
       data: {
         password: newPassword,
         version: {
-          increment: 1
+          increment: 1,
         },
-        updatedAt: Date.now()
-      }
-    })
+        updatedAt: Date.now(),
+      },
+    });
     return `Password of #${id} user updated`;
   }
 
   async remove(id: string) {
-    let user = await prisma.user.findUnique({where: {id: id}});
+    const user = await prisma.user.findUnique({ where: { id: id } });
     if (user == undefined) {
       return STATUS.NOTFOUND;
     }
-    await prisma.user.delete({where: {id: id}});
+    await prisma.user.delete({ where: { id: id } });
     console.log(`This action removes a #${id} user`);
     return STATUS.DELETED;
   }

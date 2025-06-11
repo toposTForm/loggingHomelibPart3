@@ -28,7 +28,7 @@ export class FavoritesController {
     if (!validate(id)) {
       throw new BadRequestException(`id ${id} is not UUID type!`);
     }
-    let serviceAnswer = await this.favoritesService.addTrack(id);
+    const serviceAnswer = await this.favoritesService.addTrack(id);
     if (serviceAnswer == STATUS.OBJECTONERROR) {
       throw new UnprocessableEntityException(
         `track with id: ${id} does not exist!`,
@@ -41,7 +41,7 @@ export class FavoritesController {
     if (!validate(id)) {
       throw new BadRequestException(`id ${id} is not UUID type!`);
     }
-    let serviceAnswer = await this.favoritesService.addAlbum(id);
+    const serviceAnswer = await this.favoritesService.addAlbum(id);
     if (serviceAnswer == STATUS.OBJECTONERROR) {
       throw new UnprocessableEntityException(
         `album with id: ${id} does not exist!`,
@@ -54,7 +54,7 @@ export class FavoritesController {
     if (!validate(id)) {
       throw new BadRequestException(`id ${id} is not UUID type!`);
     }
-    let serviceAnswer = await this.favoritesService.addArtist(id);
+    const serviceAnswer = await this.favoritesService.addArtist(id);
     if (serviceAnswer == STATUS.OBJECTONERROR) {
       throw new UnprocessableEntityException(
         `artist with id: ${id} does not exist!`,
@@ -73,7 +73,7 @@ export class FavoritesController {
     if (!validate(id)) {
       throw new BadRequestException(`id ${id} is not UUID type!`);
     }
-    let serviceAnswer: STATUS | unknown =
+    const serviceAnswer: STATUS | unknown =
       await this.favoritesService.removeFavTrack(id);
     if (serviceAnswer == STATUS.NOTFOUND) {
       throw new NotFoundException(`track with id ${id} no found!`);
@@ -86,8 +86,8 @@ export class FavoritesController {
     if (!validate(id)) {
       throw new BadRequestException(`id ${id} is not UUID type!`);
     }
-    let serviceAnswer: STATUS | unknown =
-     await this.favoritesService.removeFavArtist(id);
+    const serviceAnswer: STATUS | unknown =
+      await this.favoritesService.removeFavArtist(id);
     if (serviceAnswer == STATUS.NOTFOUND) {
       throw new NotFoundException(`artist with id ${id} no found!`);
     }
@@ -99,7 +99,7 @@ export class FavoritesController {
     if (!validate(id)) {
       throw new BadRequestException(`id ${id} is not UUID type!`);
     }
-    let serviceAnswer: STATUS | unknown =
+    const serviceAnswer: STATUS | unknown =
       await this.favoritesService.removeFavAlbum(id);
     if (serviceAnswer == STATUS.NOTFOUND) {
       throw new NotFoundException(`album with id ${id} no found!`);

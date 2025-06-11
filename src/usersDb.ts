@@ -1,5 +1,3 @@
 import { User } from './interface';
 
-export let users: Array<User> = [];
-
-
+export const users: Array<User> = [];

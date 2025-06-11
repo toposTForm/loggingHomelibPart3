@@ -23,54 +23,54 @@ export enum STATUS {
 @Injectable()
 export class FavoritesService {
   async addTrack(id: string) {
-    let track = await prisma.track.findUnique({where: {id: id}});
+    const track = await prisma.track.findUnique({ where: { id: id } });
     if (track == undefined) {
       return STATUS.OBJECTONERROR;
     }
     await prisma.favorites.create({
       data: {
-        tracksid: track.id
-       }
-    })
+        tracksid: track.id,
+      },
+    });
     console.log(`new favorite track added! ${JSON.stringify(track)}`);
     return track;
   }
 
   async addArtist(id: string) {
-    let artist = await prisma.artist.findUnique({where: {id: id}});
+    const artist = await prisma.artist.findUnique({ where: { id: id } });
     if (artist == undefined) {
       return STATUS.OBJECTONERROR;
     }
     await prisma.favorites.create({
       data: {
         artistsid: artist.id,
-       }
-    })
+      },
+    });
     console.log(`new favorite artist added! ${JSON.stringify(artist)}`);
     return artist;
   }
 
   async addAlbum(id: string) {
-    let album = await prisma.album.findUnique({where: {id: id}});
+    const album = await prisma.album.findUnique({ where: { id: id } });
     if (album == undefined) {
       return STATUS.OBJECTONERROR;
     }
-     await prisma.favorites.create({
+    await prisma.favorites.create({
       data: {
         albumsid: album.id,
-       }
-    })
+      },
+    });
     console.log(`new favorite album added! ${JSON.stringify(album)}`);
     return album;
   }
 
   async findAll() {
     console.log(`This action returns all favorites`);
-    let favTracks = await prisma.favorites.findMany({
+    const favTracks = await prisma.favorites.findMany({
       where: {
         tracks: {
-          isNot: null
-        }
+          isNot: null,
+        },
       },
       include: {
         tracks: {
@@ -80,54 +80,54 @@ export class FavoritesService {
             duration: true,
             artist: true,
             artistId: true,
-            albumId: true
-          }
-        }
+            albumId: true,
+          },
+        },
       },
       omit: {
         albumsid: true,
         artistsid: true,
-        usersid: true
-      }
+        usersid: true,
+      },
     });
-    let tracks = favTracks.map(track => ({
+    const tracks = favTracks.map((track) => ({
       id: track.tracks.id,
       name: track.tracks.name,
       artistId: track.tracks.artistId,
       albumId: track.tracks.albumId,
-      duration: track.tracks.duration
+      duration: track.tracks.duration,
     }));
-    let favArtists = await prisma.favorites.findMany({
+    const favArtists = await prisma.favorites.findMany({
       where: {
         artists: {
-          isNot: null
-        }
+          isNot: null,
+        },
       },
       include: {
         artists: {
           select: {
             id: true,
             name: true,
-            grammy: true
-          }
-        }
+            grammy: true,
+          },
+        },
       },
       omit: {
         albumsid: true,
         tracksid: true,
-        usersid: true
-      }
+        usersid: true,
+      },
     });
-    let artists = favArtists.map(artist => ({
+    const artists = favArtists.map((artist) => ({
       id: artist.artists.id,
       name: artist.artists.name,
-      grammy: artist.artists.grammy
+      grammy: artist.artists.grammy,
     }));
-    let favAlbums= await prisma.favorites.findMany({
+    const favAlbums = await prisma.favorites.findMany({
       where: {
         albums: {
-          isNot: null
-        }
+          isNot: null,
+        },
       },
       include: {
         albums: {
@@ -135,68 +135,68 @@ export class FavoritesService {
             id: true,
             name: true,
             year: true,
-            artistId: true
-          }
-        }
+            artistId: true,
+          },
+        },
       },
       omit: {
         artistsid: true,
         tracksid: true,
-        usersid: true
-      }
+        usersid: true,
+      },
     });
-    let albums = favAlbums.map(album => ({
+    const albums = favAlbums.map((album) => ({
       id: album.albums.id,
       name: album.albums.name,
       year: album.albums.year,
-      artistId: album.albums.artistId
+      artistId: album.albums.artistId,
     }));
-    let bla = 0;
+    const bla = 0;
     return {
       artists: artists,
       albums: albums,
-      tracks: tracks
+      tracks: tracks,
     };
   }
 
   async removeFavTrack(id: string) {
-    let track = await prisma.favorites.findUnique({
+    const track = await prisma.favorites.findUnique({
       where: {
-        tracksid: id
-      }
+        tracksid: id,
+      },
     });
     if (track == undefined) {
       return STATUS.NOTFOUND;
     }
-    await prisma.favorites.delete({where: {tracksid: id}});
+    await prisma.favorites.delete({ where: { tracksid: id } });
     console.log(`This action removes a #${id} track from favorites`);
     return STATUS.DELETED;
   }
 
   async removeFavArtist(id: string) {
-    let artist = await prisma.favorites.findUnique({
+    const artist = await prisma.favorites.findUnique({
       where: {
-        artistsid: id
-      }
+        artistsid: id,
+      },
     });
     if (artist == undefined) {
       return STATUS.NOTFOUND;
     }
-    await prisma.favorites.delete({where: {artistsid: id}});
+    await prisma.favorites.delete({ where: { artistsid: id } });
     console.log(`This action removes a #${id} artist from favorites`);
     return STATUS.DELETED;
   }
 
   async removeFavAlbum(id: string) {
-     let album = await prisma.favorites.findUnique({
+    const album = await prisma.favorites.findUnique({
       where: {
-        albumsid: id
-      }
+        albumsid: id,
+      },
     });
     if (album == undefined) {
       return STATUS.NOTFOUND;
     }
-    await prisma.favorites.delete({where: {albumsid: id}});
+    await prisma.favorites.delete({ where: { albumsid: id } });
     console.log(`This action removes a #${id} album from favorites`);
     return STATUS.DELETED;
   }

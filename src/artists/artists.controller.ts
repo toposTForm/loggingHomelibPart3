@@ -55,7 +55,7 @@ export class ArtistsController {
     if (!validate(id)) {
       throw new BadRequestException(`id ${id} is not UUID type!`);
     }
-    let data: string | unknown = await this.artistsService.findOne(id);
+    const data: string | unknown = await this.artistsService.findOne(id);
     if (data == STATUS.NOTFOUND) {
       throw new NotFoundException(`artist with id ${id} no found!`);
     } else {
@@ -64,11 +64,14 @@ export class ArtistsController {
   }
 
   @Put(':id')
-  async update(@Param('id') id: string, @Body() UpdateArtistDto: UpdateArtistDto) {
+  async update(
+    @Param('id') id: string,
+    @Body() UpdateArtistDto: UpdateArtistDto,
+  ) {
     if (!validate(id)) {
       throw new BadRequestException(`id ${id} is not UUID type!`);
     }
-    let serviceAnswer: STATUS | unknown = await this.artistsService.update(
+    const serviceAnswer: STATUS | unknown = await this.artistsService.update(
       id,
       UpdateArtistDto,
     );
