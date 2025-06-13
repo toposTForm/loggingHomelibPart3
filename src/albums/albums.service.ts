@@ -2,9 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
 import { randomUUID } from 'crypto';
-import { Album } from './entities/album.entity';
 import { validate } from 'uuid';
-import { Track } from 'src/tracks/entities/track.entity';
 import { prisma } from 'prisma/seed';
 
 export enum STATUS {

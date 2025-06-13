@@ -4,26 +4,27 @@ import {
   Post,
   Put,
   Body,
-  Patch,
   Param,
   Delete,
   BadRequestException,
   NotFoundException,
   HttpCode,
-  HttpStatus,
-  BadGatewayException,
   ForbiddenException,
+  UseInterceptors,
 } from '@nestjs/common';
 import { STATUS, UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdatePasswordDto } from './dto/update-user.dto';
 import { validate } from 'uuid';
+import { LoggingInterceptor } from 'src/logger/log.interceprot';
+import { ErrorsInterceptor } from 'src/logger/errors.interceptor';
 
 @Controller('/user')
+@UseInterceptors(LoggingInterceptor)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Post()
+  @Post() 
   create(@Body() createUserDto: CreateUserDto) {
     if (
       !(typeof createUserDto.login == 'string') ||

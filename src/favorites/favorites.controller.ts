@@ -2,22 +2,15 @@ import {
   Controller,
   Get,
   Post,
-  Body,
-  Patch,
   Param,
   Delete,
   BadRequestException,
   NotFoundException,
-  ForbiddenException,
   HttpCode,
-  Put,
   UnprocessableEntityException,
 } from '@nestjs/common';
 import { FavoritesService, STATUS } from './favorites.service';
-import { CreateFavoriteDto } from './dto/create-favorite.dto';
-import { UpdateFavoriteDto } from './dto/update-favorite.dto';
 import { validate } from 'uuid';
-import { CreateTrackDto } from 'src/tracks/dto/create-track.dto';
 
 @Controller('/favs')
 export class FavoritesController {

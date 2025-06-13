@@ -10,22 +10,28 @@ import {
   Put,
   HttpCode,
   ForbiddenException,
+  UseInterceptors,
 } from '@nestjs/common';
 import { TracksService, STATUS } from './tracks.service';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
 import { validate } from 'uuid';
 import { FavoritesService } from 'src/favorites/favorites.service';
+// import { CustomLogger } from 'src/logger/logger.service';
 
 @Controller('/track')
 export class TracksController {
   constructor(
     private readonly tracksService: TracksService,
     private readonly favoritesService: FavoritesService,
-  ) {}
+    // private customLogger: CustomLogger
+  ) {
+    
+  }
 
-  @Post()
+  @Post() @UseInterceptors()
   async create(@Body() createTrackDto: CreateTrackDto) {
+    // this.customLogger.log('track', './')
     if (
       createTrackDto.name !== undefined &&
       createTrackDto.duration !== undefined &&
@@ -99,3 +105,4 @@ export class TracksController {
     serviceAnswer = await this.favoritesService.removeFavTrack(id);
   }
 }
+

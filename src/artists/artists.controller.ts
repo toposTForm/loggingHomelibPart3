@@ -3,7 +3,6 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
   HttpCode,
@@ -15,7 +14,6 @@ import {
 import { ArtistsService, STATUS } from './artists.service';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
-import { randomUUID } from 'crypto';
 import { validate } from 'uuid';
 import { FavoritesService } from 'src/favorites/favorites.service';
 // private readonly favoritesService: FavoritesService

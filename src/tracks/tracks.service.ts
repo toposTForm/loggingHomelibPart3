@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
-import { Track } from './entities/track.entity';
 import { randomUUID } from 'crypto';
 import { prisma } from 'prisma/seed';
+import { CustomLogger } from 'src/logger/logger.service';
+
 
 export enum STATUS {
   BADREQUEST = 400,
@@ -14,6 +15,11 @@ export enum STATUS {
 
 @Injectable()
 export class TracksService {
+  constructor(private customLogger: CustomLogger) {
+    this.customLogger.log('req')
+    this.customLogger.log('res')
+  }
+
   async create(CreateTrackDto: CreateTrackDto) {
     const id = randomUUID();
     CreateTrackDto.id = id;
@@ -27,11 +33,13 @@ export class TracksService {
       },
     });
     const track = await prisma.track.findUnique({ where: { id: id } });
+    this.customLogger.log(`new track added!`);
     console.log(`new track added!`);
     return track;
   }
 
   async findAll() {
+    // this.customLogger.log(`return all tracks`)
     console.log(`This action returns all tracks`);
     const tracks = await prisma.track.findMany();
     return tracks;

@@ -2,8 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdatePasswordDto } from './dto/update-user.dto';
 import { randomUUID } from 'crypto';
-import { User } from './entities/user.entity';
-import { createUser } from 'prisma/seed';
 import { prisma } from 'prisma/seed';
 
 export enum STATUS {
@@ -13,29 +11,29 @@ export enum STATUS {
   DELETED = 204,
 }
 
-@Injectable()
+@Injectable() 
 export class UsersService {
   async create(createUserDto: CreateUserDto) {
-    const genuuid = randomUUID();
-    const version = 1.0;
-    const createdAt = Date.now();
-    const updatedAt = Date.now();
-    const typeuser = new User(
-      createUserDto,
-      genuuid,
-      version,
-      createdAt,
-      updatedAt,
-    );
-    console.log('new user added!');
-    const user = await prisma.user.findUnique({ where: { id: genuuid } });
-    return {
+    const id = randomUUID();
+    await prisma.user.create({
+      data: {
+        id: id,
+        login: createUserDto.login,
+        password: createUserDto.password,
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      },
+    });
+    const user = await prisma.user.findUnique({ where: { id: id } });
+    let mappedUser = {
       id: user.id,
       login: user.login,
-      version: user.version,
-      createdAt: Number(user.createdAt),
-      updatedAt: Number(user.updatedAt),
-    };
+      password: '***********',
+      createdAt: Number(Date.now()).toString(),
+      updatedAt: Number(Date.now()).toString(),
+    }
+    console.log(`new user created!`);
+    return mappedUser;
   }
 
   async findAll() {

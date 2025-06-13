@@ -1,4 +1,3 @@
-import { CreateFavoriteDto } from '../dto/create-favorite.dto';
 import { CreateAlbumDto } from 'src/albums/dto/create-album.dto';
 import { CreateArtistDto } from 'src/artists/dto/create-artist.dto';
 import { CreateTrackDto } from 'src/tracks/dto/create-track.dto';

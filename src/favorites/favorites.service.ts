@@ -1,15 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { CreateFavoriteDto } from './dto/create-favorite.dto';
-import { UpdateFavoriteDto } from './dto/update-favorite.dto';
-import { randomUUID } from 'crypto';
-import { validate } from 'uuid';
-import { Favorite } from './entities/favorite.entity';
-import { Track } from 'src/tracks/entities/track.entity';
-import { CreateTrackDto } from 'src/tracks/dto/create-track.dto';
-import { Artist } from 'src/artists/entities/artist.entity';
-import { CreateArtistDto } from 'src/artists/dto/create-artist.dto';
-import { CreateAlbumDto } from 'src/albums/dto/create-album.dto';
-import { Album } from 'src/albums/entities/album.entity';
 import { prisma } from 'prisma/seed';
 
 export enum STATUS {
@@ -151,7 +140,6 @@ export class FavoritesService {
       year: album.albums.year,
       artistId: album.albums.artistId,
     }));
-    const bla = 0;
     return {
       artists: artists,
       albums: albums,
