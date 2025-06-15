@@ -45,7 +45,6 @@ export class LoggingInterceptor implements NestInterceptor {
   }
 }
 
-
 async function logFunc(logIncommingMessage: object | string, responseStatus: number, logFile: string) {
     await fs.promises.appendFile(logFile, `INCOMMING_MESSAGE: {os.EOL} ${JSON.stringify(logIncommingMessage)} ${new Date()} ${os.EOL}`, 'utf-8');
     await fs.promises.appendFile(logFile, `RESPONSE_STATUS: ${responseStatus} ${new Date()} ${os.EOL}`, 'utf-8');
@@ -61,3 +60,14 @@ async function logFunc(logIncommingMessage: object | string, responseStatus: num
     nestConsole.log(logIncommingMessage);
     nestConsole.log(`RESPONSE_STATUS: ${ responseStatus} `);
 }
+
+process
+  .on('unhandledRejection', (err) => {
+    console.error(err, 'Unhandled Rejection Error');
+    logFunc(err as string, null, process.env.EXCEPTIONSLOGFILE);
+  })
+  .on('uncaughtException', err => {
+    console.error(err, 'Uncaught Exception thrown');
+    logFunc(err.message as string, null, process.env.EXCEPTIONSLOGFILE);
+    process.exit(1);
+  });

@@ -10,14 +10,17 @@ import {
   NotFoundException,
   Put,
   ForbiddenException,
+  UseInterceptors,
 } from '@nestjs/common';
 import { ArtistsService, STATUS } from './artists.service';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
 import { validate } from 'uuid';
 import { FavoritesService } from 'src/favorites/favorites.service';
-// private readonly favoritesService: FavoritesService
+import { LoggingInterceptor } from 'src/logger/log.interceprot';
+
 @Controller('/artist')
+@UseInterceptors(LoggingInterceptor)
 export class ArtistsController {
   constructor(
     private readonly artistsService: ArtistsService,

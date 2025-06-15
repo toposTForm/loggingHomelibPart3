@@ -11,48 +11,51 @@ import {
   HttpCode,
   ForbiddenException,
   UseInterceptors,
+  UnauthorizedException
 } from '@nestjs/common';
 import { STATUS, UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdatePasswordDto } from './dto/update-user.dto';
 import { validate } from 'uuid';
 import { LoggingInterceptor } from 'src/logger/log.interceprot';
-import { ErrorsInterceptor } from 'src/logger/errors.interceptor';
+import { AuthService } from 'src/auth/auth.service';
 
-@Controller('/user')
+@Controller('/auth')
 @UseInterceptors(LoggingInterceptor)
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(private readonly usersService: UsersService, private readonly AuthService: AuthService) {}
 
-  @Post() 
+  @Post('/signup') 
   create(@Body() createUserDto: CreateUserDto) {
     if (
       !(typeof createUserDto.login == 'string') ||
-      !(typeof createUserDto.password == 'string')
+      !(typeof createUserDto.password == 'string') || 
+      (createUserDto.login.length == 0) ||
+      (createUserDto.password.length <= 2 )
     ) {
-      throw new BadRequestException(`body does not contain required fields!`);
+      throw new BadRequestException(`body does not contain required fields or they are incorrect!`);
     }
     console.log(createUserDto.login);
     return this.usersService.create(createUserDto);
   }
 
-  @Put(':id')
-  async update(
-    @Param('id') id: string,
-    @Body() updatePasswordDto: UpdatePasswordDto,
-  ) {
-    if (id[0] == ':') id = id.slice(1, id.length);
-    if (!validate(id)) {
-      throw new BadRequestException(`id ${id} is not UUID type!`);
+  @Post('/login')
+  async update( @Body() updatePasswordDto: UpdatePasswordDto,) {
+    if (
+      !(typeof updatePasswordDto.login == 'string') ||
+      !(typeof updatePasswordDto.password == 'string') || 
+      (updatePasswordDto.login.length == 0) ||
+      (updatePasswordDto.password.length <= 2 )
+    ) {
+      throw new BadRequestException(`body does not contain required fields or they are incorrect!`);
     }
     const serviceAnswer: STATUS | unknown = await this.usersService.update(
-      id,
       updatePasswordDto,
     );
     if (serviceAnswer == STATUS.NOTFOUND) {
-      throw new NotFoundException(`user with id ${id} no found!`);
+      throw new NotFoundException(`user with login ${updatePasswordDto.login} no found!`);
     } else if ((serviceAnswer as STATUS) == STATUS.WRONGDTO) {
-      throw new ForbiddenException(`oldPassword is wrong!`);
+      throw new ForbiddenException(`Password is wrong!`);
     } else if (serviceAnswer == STATUS.BADREQUEST) {
       throw new BadRequestException(`invalid dto!`);
     } else {

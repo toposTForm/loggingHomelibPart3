@@ -10,14 +10,17 @@ import {
   ForbiddenException,
   HttpCode,
   Put,
+  UseInterceptors
 } from '@nestjs/common';
 import { AlbumsService, STATUS } from './albums.service';
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
 import { validate } from 'uuid';
 import { FavoritesService } from 'src/favorites/favorites.service';
-// private readonly favoritesService: FavoritesService
+import { LoggingInterceptor } from 'src/logger/log.interceprot';
+
 @Controller('/album')
+@UseInterceptors(LoggingInterceptor)
 export class AlbumsController {
   constructor(
     private readonly albumsService: AlbumsService,

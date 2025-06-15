@@ -8,11 +8,14 @@ import {
   NotFoundException,
   HttpCode,
   UnprocessableEntityException,
+  UseInterceptors,
 } from '@nestjs/common';
 import { FavoritesService, STATUS } from './favorites.service';
 import { validate } from 'uuid';
+import { LoggingInterceptor } from 'src/logger/log.interceprot';
 
 @Controller('/favs')
+@UseInterceptors(LoggingInterceptor)
 export class FavoritesController {
   constructor(private readonly favoritesService: FavoritesService) {}
 

@@ -8,7 +8,6 @@ import { CustomLogger } from './logger/logger.service';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     logger: new CustomLogger()
-    // bufferLogs: true
   });
   app.useLogger(app.get(CustomLogger))
   app.useGlobalInterceptors();

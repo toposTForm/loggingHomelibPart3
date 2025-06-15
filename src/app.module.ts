@@ -7,9 +7,6 @@ import { ArtistsModule } from './artists/artists.module';
 import { AlbumsModule } from './albums/albums.module';
 import { FavoritesModule } from './favorites/favorites.module';
 import { LoggerModule } from './logger/logger.module';
-import { NestModule } from '@nestjs/common';
-// import { LoggerMiddleware } from './logger/logger.service';
-import { MiddlewareConsumer } from '@nestjs/common';
 
 @Module({
   imports: [
@@ -25,7 +22,5 @@ import { MiddlewareConsumer } from '@nestjs/common';
   providers: [AppService],
 })
 export class AppModule{
-  // configure(consumer: MiddlewareConsumer): void {
-  //   consumer.apply(LoggerMiddleware).forRoutes('*');
-  // }
+
 }

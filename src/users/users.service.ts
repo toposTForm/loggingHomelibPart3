@@ -3,7 +3,10 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdatePasswordDto } from './dto/update-user.dto';
 import { randomUUID } from 'crypto';
 import { prisma } from 'prisma/seed';
-
+import * as bcrypt from 'bcrypt'
+import { AuthService } from 'src/auth/auth.service';
+// import { JwtModule } from '@nestjs/jwt';
+// import { ConfigModule, ConfigService } from '@nestjs/config';
 export enum STATUS {
   BADREQUEST = 400,
   NOTFOUND = 404,
@@ -11,19 +14,33 @@ export enum STATUS {
   DELETED = 204,
 }
 
+// JwtModule.registerAsync({
+//          imports: [ConfigModule],
+//          inject: [ConfigService],
+//          useFactory: async (configService: ConfigService) => ({
+//            secret: configService.get<string>('JWT_SECRET'), // Load from .env
+//            signOptions: { expiresIn: '1h' }, // Token expiration time
+//          }),
+//        }),
+
 @Injectable() 
 export class UsersService {
+  constructor(private readonly authService: AuthService){}
+
   async create(createUserDto: CreateUserDto) {
     const id = randomUUID();
-    await prisma.user.create({
-      data: {
-        id: id,
-        login: createUserDto.login,
-        password: createUserDto.password,
-        createdAt: Date.now(),
-        updatedAt: Date.now(),
-      },
-    });
+    let hashedPassword = await bcrypt.hash(createUserDto.password, 10);
+    try {
+      await prisma.user.create({
+        data: {
+          id: id,
+          login: createUserDto.login,
+          password: hashedPassword,
+          createdAt: Date.now(),
+          updatedAt: Date.now(),
+        },
+      });
+      
     const user = await prisma.user.findUnique({ where: { id: id } });
     let mappedUser = {
       id: user.id,
@@ -34,6 +51,9 @@ export class UsersService {
     }
     console.log(`new user created!`);
     return mappedUser;
+    } catch (error) {
+      return error
+    }
   }
 
   async findAll() {
@@ -64,18 +84,22 @@ export class UsersService {
     };
   }
 
-  async update(id: string, updatePasswordDto: UpdatePasswordDto) {
-    const newPassword = updatePasswordDto.newPassword;
-    const oldPassword = updatePasswordDto.oldPassword;
-    if (newPassword == undefined || oldPassword == undefined)
+  async update(updatePasswordDto: UpdatePasswordDto) {
+    const newPassword = updatePasswordDto.password;
+    
+    if (newPassword == undefined)
       return STATUS.BADREQUEST;
-    const user = await prisma.user.findUnique({ where: { id: id } });
+    const user = await prisma.user.findUnique({ where: { login: updatePasswordDto.login } });
+    let oldPassword = user.password;
+    let checkPass = await bcrypt.compare(newPassword, user.password);
+    const accessToken = await this.authService.generateToken(user.id, user.password);
     if (user == undefined) {
       return STATUS.NOTFOUND;
-    } else if (user.password !== oldPassword) return STATUS.WRONGDTO;
+    } else if (!checkPass) return STATUS.WRONGDTO;
+
     await prisma.user.update({
       where: {
-        id: id,
+        id: user.id,
       },
       data: {
         password: newPassword,
@@ -85,7 +109,7 @@ export class UsersService {
         updatedAt: Date.now(),
       },
     });
-    return `Password of #${id} user updated`;
+    return `Password of #${user.login} user updated`;
   }
 
   async remove(id: string) {
