@@ -18,7 +18,6 @@ import { UpdatePasswordDto } from './dto/update-user.dto';
 import { validate } from 'uuid';
 import { LoggingInterceptor } from 'src/logger/log.interceprot';
 
-
 @Controller('/user')
 @UseInterceptors(LoggingInterceptor)
 export class UsersController {
@@ -45,7 +44,7 @@ export class UsersController {
     if (!validate(id)) {
       throw new BadRequestException(`id ${id} is not UUID type!`);
     }
-    let serviceAnswer: STATUS | unknown = this.usersService.update(
+    const serviceAnswer: STATUS | unknown = this.usersService.update(
       id,
       updatePasswordDto,
     );
@@ -71,7 +70,7 @@ export class UsersController {
     if (!validate(id)) {
       throw new BadRequestException(`id ${id} is not UUID type!`);
     }
-    let data: string | unknown = this.usersService.findOne(id);
+    const data: string | unknown = this.usersService.findOne(id);
     if (data == STATUS.NOTFOUND) {
       throw new NotFoundException(`user with id ${id} no found!`);
     } else {
@@ -86,7 +85,7 @@ export class UsersController {
     if (!validate(id)) {
       throw new BadRequestException(`id ${id} is not UUID type!`);
     }
-    let serviceAnswer: STATUS | unknown = this.usersService.remove(id);
+    const serviceAnswer: STATUS | unknown = this.usersService.remove(id);
     if (serviceAnswer == STATUS.NOTFOUND) {
       throw new NotFoundException(`user with id ${id} no found!`);
     }

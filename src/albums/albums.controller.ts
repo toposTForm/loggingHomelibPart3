@@ -10,7 +10,7 @@ import {
   ForbiddenException,
   HttpCode,
   Put,
-  UseInterceptors
+  UseInterceptors,
 } from '@nestjs/common';
 import { AlbumsService, STATUS } from './albums.service';
 import { CreateAlbumDto } from './dto/create-album.dto';

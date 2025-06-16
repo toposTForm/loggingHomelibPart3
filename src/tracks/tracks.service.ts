@@ -5,7 +5,6 @@ import { randomUUID } from 'crypto';
 import { prisma } from 'prisma/seed';
 import { CustomLogger } from 'src/logger/logger.service';
 
-
 export enum STATUS {
   BADREQUEST = 400,
   NOTFOUND = 404,
@@ -16,8 +15,8 @@ export enum STATUS {
 @Injectable()
 export class TracksService {
   constructor(private customLogger: CustomLogger) {
-    this.customLogger.log('req')
-    this.customLogger.log('res')
+    this.customLogger.log('req');
+    this.customLogger.log('res');
   }
 
   async create(CreateTrackDto: CreateTrackDto) {

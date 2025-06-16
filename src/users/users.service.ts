@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdatePasswordDto } from './dto/update-user.dto';
-import { randomUUID, UUID } from 'crypto';
+import { randomUUID } from 'crypto';
 import { User } from './entities/user.entity';
 
 export enum STATUS {
@@ -14,10 +14,10 @@ export enum STATUS {
 @Injectable()
 export class UsersService {
   create(createUserDto: CreateUserDto) {
-    let genuuid = randomUUID();
-    let version = 1.0;
-    let createdAt = Date.now();
-    let updatedAt = Date.now();
+    const genuuid = randomUUID();
+    const version = 1.0;
+    const createdAt = Date.now();
+    const updatedAt = Date.now();
     const user = new User(
       createUserDto,
       genuuid,
@@ -26,7 +26,7 @@ export class UsersService {
       updatedAt,
     );
     console.log('new user added!');
-    let tempUser = {
+    const tempUser = {
       id: '',
       login: '',
       version: null,
@@ -47,7 +47,7 @@ export class UsersService {
   }
 
   findOne(id: string) {
-    let user = User.usersDb.find((user) => user.id == id);
+    const user = User.usersDb.find((user) => user.id == id);
     if (user == undefined) {
       return STATUS.NOTFOUND;
     }
@@ -56,11 +56,11 @@ export class UsersService {
   }
 
   update(id: string, updatePasswordDto: UpdatePasswordDto) {
-    let newPassword = updatePasswordDto.newPassword;
-    let oldPassword = updatePasswordDto.oldPassword;
+    const newPassword = updatePasswordDto.newPassword;
+    const oldPassword = updatePasswordDto.oldPassword;
     if (newPassword == undefined || oldPassword == undefined)
       return STATUS.BADREQUEST;
-    let user = User.usersDb.find((user) => user.id == id);
+    const user = User.usersDb.find((user) => user.id == id);
     if (user == undefined) {
       return STATUS.NOTFOUND;
     } else if (user.password !== oldPassword) return STATUS.WRONGDTO;
@@ -71,7 +71,7 @@ export class UsersService {
   }
 
   remove(id: string) {
-    let userIdex = User.usersDb.findIndex((user) => user.id == id);
+    const userIdex = User.usersDb.findIndex((user) => user.id == id);
     if (userIdex == -1) {
       return STATUS.NOTFOUND;
     }

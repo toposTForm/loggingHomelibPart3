@@ -25,11 +25,9 @@ export class TracksController {
   constructor(
     private readonly tracksService: TracksService,
     private readonly favoritesService: FavoritesService,
-  ) {
-    
-  }
+  ) {}
 
-  @Post() 
+  @Post()
   async create(@Body() createTrackDto: CreateTrackDto) {
     if (
       createTrackDto.name !== undefined &&
@@ -104,4 +102,3 @@ export class TracksController {
     serviceAnswer = await this.favoritesService.removeFavTrack(id);
   }
 }
-
