@@ -14,7 +14,7 @@ import { STATUS } from './auth.service'
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { UpdatePasswordDto } from 'src/users/dto/update-user.dto';
 import { LoggingInterceptor } from 'src/logger/log.interceprot';
-import { Public } from './auth.module';
+import { Public } from './public.decorator';
 
 @Controller('auth')
 @UseInterceptors(LoggingInterceptor)
@@ -35,7 +35,8 @@ export class AuthController {
         console.log(createUserDto.login);
         return this.authService.create(createUserDto);
       }
-    
+     
+      @Public()
       @Post('/login')
       @HttpCode(200)
       async update( @Body() updatePasswordDto: UpdatePasswordDto,) {
@@ -61,6 +62,7 @@ export class AuthController {
         }
       }
     
+      @Public()
       @Post('/refresh')
       @HttpCode(200)
       async refresh( @Body() refreshToken: any){

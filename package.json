@@ -23,7 +23,8 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "start:migrate:prod": "prisma migrate deploy && npm run start:prod"
+    "start:migrate:prod": "prisma migrate deploy && npm run start:prod",
+    "start:migrate:init": "prisma migrate dev --name init"
   },
   "prisma": {
     "seed": "ts-node prisma/seed.ts"
