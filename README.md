@@ -71,38 +71,54 @@ Press <kbd>F5</kbd> to debug.
 For more information, visit: https://code.visualstudio.com/docs/editor/debugging
 
 
-
+```
+## Running the Task
+## FOR CORRECT RUN PLS MAKE:
+```
 FOR CORRECT RUN PLS MAKE:
 
-for dev version:
-
+```
+## for dev version:
+```
 npm install
 npx prisma generate
 
 download postgres image from docker hub and set credentials from .env
-after starting DB:
 
+
+```
+## after starting DB:
+```
 npx prisma migrate dev --name init
 
 
-OR:
-
-for container creating and run:
+```
+## OR
+## for container creating and run:
+```
 
 docker compose -f docker-compose.yml up --build -d
 docker compose -f docker-compose.yml up
+```
+## if DB table empty
+```
 npx prisma migrate dev --name init
-
-you also can run tests inside docker
-
-you can stop the app volume in container and start it in develop mode to check logger
-
-
-ALL LOGS pushed to "./src/logFiles" Folder
+```
+## you also can run tests inside docker
+## you can stop the app volume in container and start it in develop mode to check logger
+```
 
 
+```
+## ALL LOGS pushed to "./src/logFiles" Folder
+## DATABASE STARTED ON PORT=4000 localhost, DATABASE ON PORT 5432
+## YOU CAN CHOOSE ANOTHER PORTS IN .env if they are occupied in your PC
+```
 
-DATABASE STARTED ON PORT=4000 localhost, DATABASE ON PORT 5432
 
-YOU CAN CHOOSE ANOTHER PORTS IN .env if they are occupied in your PC
+
+
+
+
+
 
