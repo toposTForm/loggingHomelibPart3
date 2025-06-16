@@ -11,69 +11,53 @@ import {
   HttpCode,
   ForbiddenException,
   UseInterceptors,
-  UnauthorizedException
 } from '@nestjs/common';
 import { STATUS, UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdatePasswordDto } from './dto/update-user.dto';
 import { validate } from 'uuid';
 import { LoggingInterceptor } from 'src/logger/log.interceprot';
-import { AuthService } from 'src/auth/auth.service';
 
-@Controller('/auth')
+
+@Controller('/user')
 @UseInterceptors(LoggingInterceptor)
 export class UsersController {
-  constructor(private readonly usersService: UsersService, private readonly AuthService: AuthService) {}
+  constructor(private readonly usersService: UsersService) {}
 
-  @Post('/signup') 
+  @Post()
   create(@Body() createUserDto: CreateUserDto) {
     if (
       !(typeof createUserDto.login == 'string') ||
-      !(typeof createUserDto.password == 'string') || 
-      (createUserDto.login.length == 0) ||
-      (createUserDto.password.length <= 2 )
+      !(typeof createUserDto.password == 'string')
     ) {
-      throw new BadRequestException(`body does not contain required fields or they are incorrect!`);
+      throw new BadRequestException(`body does not contain required fields!`);
     }
     console.log(createUserDto.login);
     return this.usersService.create(createUserDto);
   }
 
-  @Post('/login')
-  @HttpCode(200)
-  async update( @Body() updatePasswordDto: UpdatePasswordDto,) {
-    if (
-      !(typeof updatePasswordDto.login == 'string') ||
-      !(typeof updatePasswordDto.password == 'string') || 
-      (updatePasswordDto.login.length == 0) ||
-      (updatePasswordDto.password.length <= 2 )
-    ) {
-      throw new BadRequestException(`body does not contain required fields or they are incorrect!`);
+  @Put(':id')
+  update(
+    @Param('id') id: string,
+    @Body() updatePasswordDto: UpdatePasswordDto,
+  ) {
+    if (id[0] == ':') id = id.slice(1, id.length);
+    if (!validate(id)) {
+      throw new BadRequestException(`id ${id} is not UUID type!`);
     }
-    const serviceAnswer: STATUS | unknown = await this.usersService.update(
+    let serviceAnswer: STATUS | unknown = this.usersService.update(
+      id,
       updatePasswordDto,
     );
     if (serviceAnswer == STATUS.NOTFOUND) {
-      throw new NotFoundException(`user with login ${updatePasswordDto.login} no found!`);
+      throw new NotFoundException(`user with id ${id} no found!`);
     } else if ((serviceAnswer as STATUS) == STATUS.WRONGDTO) {
-      throw new ForbiddenException(`Password is wrong!`);
+      throw new ForbiddenException(`oldPassword is wrong!`);
     } else if (serviceAnswer == STATUS.BADREQUEST) {
       throw new BadRequestException(`invalid dto!`);
     } else {
       return serviceAnswer;
     }
-  }
-
-  @Post('/refresh')
-  @HttpCode(200)
-  async refresh( @Body() refreshToken: string){
-    if (refreshToken == undefined || refreshToken == '' || refreshToken.length < 10) {
-      throw new UnauthorizedException(`body does not contain required fields or they are incorrect!`);
-    }
-    const serviceAnswer: STATUS | unknown = await this.usersService.refresh(
-      refreshToken,
-    );
-    return serviceAnswer;
   }
 
   @Get()
@@ -82,11 +66,12 @@ export class UsersController {
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string) {
+  findOne(@Param('id') id: string) {
+    // if (id[0] == ':') id = id.slice(1,id.length);
     if (!validate(id)) {
       throw new BadRequestException(`id ${id} is not UUID type!`);
     }
-    const data: string | unknown = await this.usersService.findOne(id);
+    let data: string | unknown = this.usersService.findOne(id);
     if (data == STATUS.NOTFOUND) {
       throw new NotFoundException(`user with id ${id} no found!`);
     } else {
@@ -96,12 +81,12 @@ export class UsersController {
 
   @Delete(':id')
   @HttpCode(204)
-  async remove(@Param('id') id: string) {
+  remove(@Param('id') id: string) {
     if (id[0] == ':') id = id.slice(1, id.length);
     if (!validate(id)) {
       throw new BadRequestException(`id ${id} is not UUID type!`);
     }
-    const serviceAnswer: STATUS | unknown = await this.usersService.remove(id);
+    let serviceAnswer: STATUS | unknown = this.usersService.remove(id);
     if (serviceAnswer == STATUS.NOTFOUND) {
       throw new NotFoundException(`user with id ${id} no found!`);
     }

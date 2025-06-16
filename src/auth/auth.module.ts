@@ -4,6 +4,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthService } from './auth.service';
 import { UsersService } from 'src/users/users.service';
 import { AuthController } from './auth.controller';
+import { AuthGuard } from './auth.guard';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -17,8 +19,16 @@ import { AuthController } from './auth.controller';
         }),
     }),
   ],
-  providers: [AuthService, UsersService, ConfigService],
+  providers: [AuthService, UsersService, ConfigService,   {
+    provide: APP_GUARD,
+    useClass: AuthGuard,
+  },],
   controllers: [AuthController],
   exports: [AuthService],
 })
 export class AuthModule {}
+
+import { SetMetadata } from '@nestjs/common';
+
+export const IS_PUBLIC_KEY = 'isPublic';
+export const Public = () => SetMetadata(IS_PUBLIC_KEY, true);
