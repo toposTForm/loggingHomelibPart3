@@ -40,6 +40,7 @@ export class UsersController {
   }
 
   @Post('/login')
+  @HttpCode(200)
   async update( @Body() updatePasswordDto: UpdatePasswordDto,) {
     if (
       !(typeof updatePasswordDto.login == 'string') ||
@@ -61,6 +62,18 @@ export class UsersController {
     } else {
       return serviceAnswer;
     }
+  }
+
+  @Post('/refresh')
+  @HttpCode(200)
+  async refresh( @Body() refreshToken: string){
+    if (refreshToken == undefined || refreshToken == '' || refreshToken.length < 10) {
+      throw new UnauthorizedException(`body does not contain required fields or they are incorrect!`);
+    }
+    const serviceAnswer: STATUS | unknown = await this.usersService.refresh(
+      refreshToken,
+    );
+    return serviceAnswer;
   }
 
   @Get()

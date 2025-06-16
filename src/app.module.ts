@@ -7,6 +7,8 @@ import { ArtistsModule } from './artists/artists.module';
 import { AlbumsModule } from './albums/albums.module';
 import { FavoritesModule } from './favorites/favorites.module';
 import { LoggerModule } from './logger/logger.module';
+import { AuthModule } from './auth/auth.module';
+// import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -16,7 +18,7 @@ import { LoggerModule } from './logger/logger.module';
     AlbumsModule,
     FavoritesModule,
     LoggerModule,
-    
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],

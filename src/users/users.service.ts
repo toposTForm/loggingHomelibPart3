@@ -5,8 +5,7 @@ import { randomUUID } from 'crypto';
 import { prisma } from 'prisma/seed';
 import * as bcrypt from 'bcrypt'
 import { AuthService } from 'src/auth/auth.service';
-// import { JwtModule } from '@nestjs/jwt';
-// import { ConfigModule, ConfigService } from '@nestjs/config';
+
 export enum STATUS {
   BADREQUEST = 400,
   NOTFOUND = 404,
@@ -14,14 +13,7 @@ export enum STATUS {
   DELETED = 204,
 }
 
-// JwtModule.registerAsync({
-//          imports: [ConfigModule],
-//          inject: [ConfigService],
-//          useFactory: async (configService: ConfigService) => ({
-//            secret: configService.get<string>('JWT_SECRET'), // Load from .env
-//            signOptions: { expiresIn: '1h' }, // Token expiration time
-//          }),
-//        }),
+
 
 @Injectable() 
 export class UsersService {
@@ -40,7 +32,6 @@ export class UsersService {
           updatedAt: Date.now(),
         },
       });
-      
     const user = await prisma.user.findUnique({ where: { id: id } });
     let mappedUser = {
       id: user.id,
@@ -86,30 +77,86 @@ export class UsersService {
 
   async update(updatePasswordDto: UpdatePasswordDto) {
     const newPassword = updatePasswordDto.password;
-    
+    let refreshToken;
     if (newPassword == undefined)
       return STATUS.BADREQUEST;
-    const user = await prisma.user.findUnique({ where: { login: updatePasswordDto.login } });
-    let oldPassword = user.password;
+    const user = await prisma.user.findFirst({ where: { login: updatePasswordDto.login } });
+    if (user == null) {
+      return STATUS.NOTFOUND;
+    }
     let checkPass = await bcrypt.compare(newPassword, user.password);
     const accessToken = await this.authService.generateToken(user.id, user.password);
-    if (user == undefined) {
-      return STATUS.NOTFOUND;
-    } else if (!checkPass) return STATUS.WRONGDTO;
-
-    await prisma.user.update({
-      where: {
-        id: user.id,
-      },
-      data: {
-        password: newPassword,
-        version: {
-          increment: 1,
+    if (user.refreshToken == undefined && user.refresTockenLifeTime == undefined){
+      let refreshTokenLifeTime = new Date(Date.now() + ( 3600 * 1000 * Number(process.env.REFRESH_TOKEN_LIFETIME)));
+      refreshToken = await this.authService.generateRefreshToken(user.id,'', refreshTokenLifeTime);
+      await prisma.user.update({
+        where: {
+          id: user.id,
         },
-        updatedAt: Date.now(),
-      },
-    });
-    return `Password of #${user.login} user updated`;
+        data: {
+          accessToken: accessToken,
+          refreshToken: refreshToken,
+          refresTockenLifeTime: refreshTokenLifeTime,
+          version: {
+            increment: 1,
+          },
+          updatedAt: Date.now(),
+        },
+     });
+    } else {
+      let refreshTokenLifeTime = new Date(Date.now() + ( 3600 * 1000 * Number(process.env.REFRESH_TOKEN_LIFETIME)));
+      refreshToken = await this.authService.generateRefreshToken(user.id, user.refreshToken, user.refresTockenLifeTime);
+      await prisma.user.update({
+        where: {
+          id: user.id,
+        },
+        data: {
+          accessToken: accessToken,
+          refreshToken: refreshToken,
+          refresTockenLifeTime: refreshTokenLifeTime,
+          version: {
+            increment: 1,
+          },
+          updatedAt: Date.now(),
+        },
+     });
+    }
+    if (!checkPass) return STATUS.WRONGDTO;
+    console.log( `Tokens of #${user.login} user updated`);
+    return {
+      accessToken: accessToken,
+      refreshToken: refreshToken
+    };
+  }
+
+  async refresh(refrTocken: any){
+    const user = await prisma.user.findUnique({ where: { refreshToken: refrTocken.refreshToken } });
+      if (user == null) {
+        return STATUS.NOTFOUND;
+      }
+      let refreshToken;
+      const accessToken = await this.authService.generateToken(user.id, user.password);
+      let refreshTokenLifeTime = new Date(Date.now() + ( 3600 * 1000 * Number(process.env.REFRESH_TOKEN_LIFETIME)));
+      refreshToken = await this.authService.generateRefreshToken(user.id,'', refreshTokenLifeTime);
+      await prisma.user.update({
+        where: {
+          id: user.id,
+        },
+        data: {
+          accessToken: accessToken,
+          refreshToken: refreshToken,
+          refresTockenLifeTime: refreshTokenLifeTime,
+          version: {
+            increment: 1,
+          },
+          updatedAt: Date.now(),
+        },
+      });
+    return {
+      AccessTocken: accessToken,
+      refreshToken: refreshToken
+    };
+   
   }
 
   async remove(id: string) {
