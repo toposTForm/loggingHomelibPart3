@@ -14,4 +14,4 @@ COPY . .
 
 RUN npx prisma generate
 RUN npm cache clean --force
-CMD [ "npm", "start", "start:migrate:prod" ]
+CMD [ "npm", "start", "start:migrate:prod", "start:migrate:init" ]

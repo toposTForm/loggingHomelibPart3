@@ -3,7 +3,6 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
   HttpCode,
@@ -11,15 +10,17 @@ import {
   NotFoundException,
   Put,
   ForbiddenException,
+  UseInterceptors,
 } from '@nestjs/common';
 import { ArtistsService, STATUS } from './artists.service';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
-import { randomUUID } from 'crypto';
 import { validate } from 'uuid';
 import { FavoritesService } from 'src/favorites/favorites.service';
-// private readonly favoritesService: FavoritesService
+import { LoggingInterceptor } from 'src/logger/log.interceprot';
+
 @Controller('/artist')
+@UseInterceptors(LoggingInterceptor)
 export class ArtistsController {
   constructor(
     private readonly artistsService: ArtistsService,
@@ -55,7 +56,7 @@ export class ArtistsController {
     if (!validate(id)) {
       throw new BadRequestException(`id ${id} is not UUID type!`);
     }
-    let data: string | unknown = await this.artistsService.findOne(id);
+    const data: string | unknown = await this.artistsService.findOne(id);
     if (data == STATUS.NOTFOUND) {
       throw new NotFoundException(`artist with id ${id} no found!`);
     } else {
@@ -64,11 +65,14 @@ export class ArtistsController {
   }
 
   @Put(':id')
-  async update(@Param('id') id: string, @Body() UpdateArtistDto: UpdateArtistDto) {
+  async update(
+    @Param('id') id: string,
+    @Body() UpdateArtistDto: UpdateArtistDto,
+  ) {
     if (!validate(id)) {
       throw new BadRequestException(`id ${id} is not UUID type!`);
     }
-    let serviceAnswer: STATUS | unknown = await this.artistsService.update(
+    const serviceAnswer: STATUS | unknown = await this.artistsService.update(
       id,
       UpdateArtistDto,
     );

@@ -4,22 +4,22 @@ import {
   Post,
   Put,
   Body,
-  Patch,
   Param,
   Delete,
   BadRequestException,
   NotFoundException,
   HttpCode,
-  HttpStatus,
-  BadGatewayException,
   ForbiddenException,
+  UseInterceptors,
 } from '@nestjs/common';
 import { STATUS, UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdatePasswordDto } from './dto/update-user.dto';
 import { validate } from 'uuid';
+import { LoggingInterceptor } from 'src/logger/log.interceprot';
 
 @Controller('/user')
+@UseInterceptors(LoggingInterceptor)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
@@ -36,7 +36,7 @@ export class UsersController {
   }
 
   @Put(':id')
-  async update(
+  update(
     @Param('id') id: string,
     @Body() updatePasswordDto: UpdatePasswordDto,
   ) {
@@ -44,7 +44,7 @@ export class UsersController {
     if (!validate(id)) {
       throw new BadRequestException(`id ${id} is not UUID type!`);
     }
-    let serviceAnswer: STATUS | unknown = await this.usersService.update(
+    const serviceAnswer: STATUS | unknown = this.usersService.update(
       id,
       updatePasswordDto,
     );
@@ -65,11 +65,12 @@ export class UsersController {
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string) {
+  findOne(@Param('id') id: string) {
+    // if (id[0] == ':') id = id.slice(1,id.length);
     if (!validate(id)) {
       throw new BadRequestException(`id ${id} is not UUID type!`);
     }
-    let data: string | unknown = await this.usersService.findOne(id);
+    const data: string | unknown = this.usersService.findOne(id);
     if (data == STATUS.NOTFOUND) {
       throw new NotFoundException(`user with id ${id} no found!`);
     } else {
@@ -79,12 +80,12 @@ export class UsersController {
 
   @Delete(':id')
   @HttpCode(204)
-  async remove(@Param('id') id: string) {
+  remove(@Param('id') id: string) {
     if (id[0] == ':') id = id.slice(1, id.length);
     if (!validate(id)) {
       throw new BadRequestException(`id ${id} is not UUID type!`);
     }
-    let serviceAnswer: STATUS | unknown = await this.usersService.remove(id);
+    const serviceAnswer: STATUS | unknown = this.usersService.remove(id);
     if (serviceAnswer == STATUS.NOTFOUND) {
       throw new NotFoundException(`user with id ${id} no found!`);
     }

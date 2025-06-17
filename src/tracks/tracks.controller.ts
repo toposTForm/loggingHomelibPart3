@@ -10,14 +10,17 @@ import {
   Put,
   HttpCode,
   ForbiddenException,
+  UseInterceptors,
 } from '@nestjs/common';
 import { TracksService, STATUS } from './tracks.service';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
 import { validate } from 'uuid';
 import { FavoritesService } from 'src/favorites/favorites.service';
+import { LoggingInterceptor } from 'src/logger/log.interceprot';
 
 @Controller('/track')
+@UseInterceptors(LoggingInterceptor)
 export class TracksController {
   constructor(
     private readonly tracksService: TracksService,
@@ -38,7 +41,7 @@ export class TracksController {
       ) {
         throw new BadRequestException(`body does not contain required fields!`);
       }
-      let track = await this.tracksService.create(createTrackDto);
+      const track = await this.tracksService.create(createTrackDto);
       return track;
     } else {
       throw new BadRequestException(`body does not contain required fields!`);
@@ -55,7 +58,7 @@ export class TracksController {
     if (!validate(id)) {
       throw new BadRequestException(`id ${id} is not UUID type!`);
     }
-    let data: string | unknown = await this.tracksService.findOne(id);
+    const data: string | unknown = await this.tracksService.findOne(id);
     if (data == STATUS.NOTFOUND) {
       throw new NotFoundException(`track with id ${id} no found!`);
     } else {
@@ -64,11 +67,14 @@ export class TracksController {
   }
 
   @Put(':id')
-  async update(@Param('id') id: string, @Body() UpdateTrackDto: UpdateTrackDto) {
+  async update(
+    @Param('id') id: string,
+    @Body() UpdateTrackDto: UpdateTrackDto,
+  ) {
     if (!validate(id)) {
       throw new BadRequestException(`id ${id} is not UUID type!`);
     }
-    let serviceAnswer: STATUS | unknown = await this.tracksService.update(
+    const serviceAnswer: STATUS | unknown = await this.tracksService.update(
       id,
       UpdateTrackDto,
     );
